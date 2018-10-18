@@ -152,6 +152,8 @@ public class MainFrame extends JFrame
                 galaxy.links.add(new StarSystemLink(possibleConnections.get(i), star));
             }
         }
+
+        this.repaint();
     }
 
     protected Color randomColor()
