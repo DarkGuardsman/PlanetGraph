@@ -11,4 +11,10 @@ public class Galaxy
 {
     public final List<StarSystemLink> links = new ArrayList();
     public final List<StarSystem> starSystems = new ArrayList();
+
+    public void clear()
+    {
+        links.clear();
+        starSystems.clear();
+    }
 }
