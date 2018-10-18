@@ -170,7 +170,7 @@ public class RenderPanel extends JPanel
                 double y2 = getHeight() - PAD - scaleY * (link.b.y + plotOffsetY);
 
                 //Draw line
-                g2.setPaint(Color.YELLOW);
+                g2.setPaint(link.color);
                 g2.draw(new Line2D.Double(x, y, x2, y2));
             }
         }

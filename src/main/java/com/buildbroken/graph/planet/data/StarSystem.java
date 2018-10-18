@@ -13,6 +13,7 @@ import java.util.List;
 public class StarSystem extends Point
 {
     public final List<StarSystemObject> objects = new ArrayList();
+    public final List<StarSystemLink> links = new ArrayList();
 
     public Color renderColor;
     public int renderSize = 10;
@@ -33,5 +34,27 @@ public class StarSystem extends Point
     public String toString()
     {
         return "Star[" + x + ", " + y + "]";
+    }
+
+    public void addLink(StarSystemLink starSystemLink)
+    {
+        links.add(starSystemLink);
+    }
+
+    public void removeLink(StarSystemLink starSystemLink)
+    {
+        links.remove(starSystemLink);
+    }
+
+    public boolean hasLink(StarSystem star)
+    {
+        for(StarSystemLink link : links)
+        {
+            if(link.a == star || link.b == star)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

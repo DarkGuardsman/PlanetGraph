@@ -7,10 +7,8 @@ import com.buildbroken.graph.planet.gui.components.RenderPanel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.*;
+import java.util.List;
 
 /**
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
@@ -79,7 +77,7 @@ public class MainFrame extends JFrame
     protected void generateData()
     {
         final int minStarDistance = 5;
-        final int starLinkDistance = 25;
+        final int starLinkDistance = 15;
 
         System.out.println("MainFrame#generateData() - generating data");
 
@@ -131,15 +129,15 @@ public class MainFrame extends JFrame
         LinkedList<StarSystem> systemsToPath = new LinkedList();
         systemsToPath.addAll(galaxy.starSystems);
 
-        while(systemsToPath.peek() != null)
+        while (systemsToPath.peek() != null)
         {
             StarSystem star = systemsToPath.poll();
 
             //Find nearby stars
             ArrayList<StarSystem> possibleConnections = new ArrayList();
-            for(StarSystem s : galaxy.starSystems)
+            for (StarSystem s : galaxy.starSystems)
             {
-                if(s != star && s.distance(star.x, star.y) <= starLinkDistance)
+                if (s != star && s.distance(star.x, star.y) <= starLinkDistance)
                 {
                     possibleConnections.add(s);
                 }
@@ -147,13 +145,78 @@ public class MainFrame extends JFrame
 
             Collections.sort(possibleConnections, Comparator.comparingDouble(o -> o.distanceSQ(star.x, star.y)));
             int linksToMake = 1 + (int) (Math.random() * 4);
-            for(int i = 0; i < possibleConnections.size() && i < linksToMake; i++)
+            for (int i = 0; i < possibleConnections.size() && i < linksToMake; i++)
             {
-                galaxy.links.add(new StarSystemLink(possibleConnections.get(i), star));
+                galaxy.links.add(new StarSystemLink(possibleConnections.get(i), star).buildLink());
             }
         }
 
+        //TODO remove overlap links
+
+        //Build clusters
+        List<HashSet<StarSystem>> clusters = new ArrayList();
+
+        HashSet<StarSystem> pathedStars = new HashSet();
+        for (StarSystem system : galaxy.starSystems)
+        {
+            if (!pathedStars.contains(system))
+            {
+                //Create hash set to track systems in cluster
+                HashSet<StarSystem> systems = new HashSet();
+                systems.add(system);
+
+                //Map out all links to create cluster
+                collectStarsOnPath(systems, system);
+
+                //Prevent pathing the systems again
+                pathedStars.addAll(systems);
+
+                //Add to cluster list
+                clusters.add(systems);
+
+                Color color = randomColor();
+                for(StarSystem s : systems)
+                {
+                    for(StarSystemLink link : s.links)
+                    {
+                        link.color = color;
+                    }
+                }
+            }
+        }
+
+        //Build links between clusters
+
         this.repaint();
+    }
+
+    protected void collectStarsOnPath(HashSet<StarSystem> systems, StarSystem star)
+    {
+        for (StarSystemLink link : star.links)
+        {
+            if (link.a != star && !systems.contains(link.a))
+            {
+                systems.add(link.a);
+                collectStarsOnPath(systems, link.a);
+            }
+            else if (link.b != star && !systems.contains(link.b))
+            {
+                systems.add(link.b);
+                collectStarsOnPath(systems, link.b);
+            }
+        }
+    }
+
+    protected boolean isPartOfCluster(List<StarSystem> systems, StarSystem star)
+    {
+        for (StarSystem system : systems)
+        {
+            if (system.hasLink(star))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     protected Color randomColor()
