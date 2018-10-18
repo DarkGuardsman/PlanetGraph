@@ -26,7 +26,7 @@ public class MainFrame extends JFrame
         setLocation(200, 200);
         setTitle("Planet Graph - Prototype");
 
-        galaxy = new Galaxy();
+        galaxy = new Galaxy(250, 250);
 
         add(buildCenter());
 
@@ -40,7 +40,9 @@ public class MainFrame extends JFrame
         panel.add(plotPanel = new RenderPanel(galaxy), BorderLayout.CENTER);
         plotPanel.setMinimumSize(new Dimension(600, 600));
         plotPanel.setPreferredSize(new Dimension(600, 600));
-        plotPanel.drawLines(1, 1);
+        plotPanel.drawLines(10, 10);
+        plotPanel.setPlotSize(600, 600);
+        plotPanel.setPlotOffset(50, 50);
 
         panel.add(buildControls(), BorderLayout.WEST);
         return panel;
@@ -57,11 +59,36 @@ public class MainFrame extends JFrame
 
     protected void generateData()
     {
+        System.out.println("MainFrame#generateData() - generating data");
         galaxy.clear();
-        for (int i = 0; i < 1000; i++)
+        while (galaxy.starSystems.size() < 1000)
         {
-            StarSystem system = new StarSystem(Math.random() * 500, Math.random() * 500, randomColor());
-            galaxy.starSystems.add(system);
+            double x = Math.random() * 500;
+            double y = Math.random() * 500;
+            StarSystem system = new StarSystem(x, y, randomColor());
+
+            double distance = system.distance(250, 250);
+
+            if (distance > 250)
+            {
+                System.out.println("\t- to far from center, " + system);
+            }
+            else if (distance > 50)
+            {
+                if (!galaxy.areAnyStarsNear(x, y, 5))
+                {
+                    System.out.println("\t- added " + system);
+                    galaxy.starSystems.add(system);
+                }
+                else
+                {
+                    System.out.println("\t- to close to other stars, " + system);
+                }
+            }
+            else
+            {
+                System.out.println("\t- to close to center, " + system);
+            }
         }
     }
 

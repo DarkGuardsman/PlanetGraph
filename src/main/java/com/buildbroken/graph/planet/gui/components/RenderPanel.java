@@ -30,6 +30,9 @@ public class RenderPanel extends JPanel
     int plotSizeX = -1;
     int plotSizeY = -1;
 
+    int plotOffsetX = 0;
+    int plotOffsetY = 0;
+
     double plotLineSpacingX = -1;
     double plotLineSpacingY = -1;
 
@@ -143,7 +146,7 @@ public class RenderPanel extends JPanel
             //Render data points
             for (StarSystem pos : galaxy.starSystems)
             {
-                drawCircle(g2, pos.renderColor, pos.x, pos.y, pos.renderSize, true);
+                drawCircle(g2, pos.renderColor, pos.x + plotOffsetX, pos.y + plotOffsetY, pos.renderSize, true);
             }
         }
     }
@@ -272,6 +275,12 @@ public class RenderPanel extends JPanel
     {
         this.plotSizeY = y;
         this.plotSizeX = x;
+    }
+
+    public void setPlotOffset(int x, int y)
+    {
+        this.plotOffsetY = y;
+        this.plotOffsetX = x;
     }
 
     public int getPlotSizeX()

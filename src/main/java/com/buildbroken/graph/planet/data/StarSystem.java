@@ -10,21 +10,17 @@ import java.util.List;
  * @see <a href="https://github.com/BuiltBrokenModding/VoltzEngine/blob/development/license.md">License</a> for what you can and can't do with the code.
  * Created by Dark(DarkGuardsman, Robert) on 2/27/2018.
  */
-public class StarSystem
+public class StarSystem extends Point
 {
-    public final double x;
-    public final double y;
-
     public final List<StarSystemObject> objects = new ArrayList();
 
     public Color renderColor;
-    public int renderSize = 4;
+    public int renderSize = 10;
 
 
     public StarSystem(double x, double y, Color color)
     {
-        this.x = x;
-        this.y = y;
+        super(x, y);
         this.renderColor = color;
     }
 
@@ -34,13 +30,8 @@ public class StarSystem
         this.renderSize = size;
     }
 
-    public double x()
+    public String toString()
     {
-        return x;
-    }
-
-    public double y()
-    {
-        return y;
+        return "Star[" + x + ", " + y + "]";
     }
 }
