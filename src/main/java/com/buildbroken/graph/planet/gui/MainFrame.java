@@ -79,7 +79,7 @@ public class MainFrame extends JFrame
     protected void generateData()
     {
         final int minStarDistance = 5;
-        final int starLinkDistance = 10;
+        final int starLinkDistance = 15;
 
         System.out.println("MainFrame#generateData() - generating data");
 
