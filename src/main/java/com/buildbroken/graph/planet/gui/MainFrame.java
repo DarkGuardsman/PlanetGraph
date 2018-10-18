@@ -79,7 +79,7 @@ public class MainFrame extends JFrame
     protected void generateData()
     {
         final int minStarDistance = 5;
-        final int starLinkDistance = 15;
+        final int starLinkDistance = 25;
 
         System.out.println("MainFrame#generateData() - generating data");
 
@@ -98,7 +98,7 @@ public class MainFrame extends JFrame
 
             //Create system
             StarSystem system = new StarSystem(x, y, randomColor());
-            system.renderSize = 4 + (int) Math.random() * 5;
+            system.renderSize = 10 + (int) Math.random() * 5;
 
             //Limit distance
             double distance = system.distance(250, 250);
@@ -146,7 +146,7 @@ public class MainFrame extends JFrame
             }
 
             Collections.sort(possibleConnections, Comparator.comparingDouble(o -> o.distanceSQ(star.x, star.y)));
-            int linksToMake = (int) (Math.random() * 5);
+            int linksToMake = 1 + (int) (Math.random() * 4);
             for(int i = 0; i < possibleConnections.size() && i < linksToMake; i++)
             {
                 galaxy.links.add(new StarSystemLink(possibleConnections.get(i), star));
