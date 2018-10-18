@@ -3,6 +3,7 @@ package com.buildbroken.graph.planet.gui.components;
 
 import com.buildbroken.graph.planet.data.Galaxy;
 import com.buildbroken.graph.planet.data.StarSystem;
+import com.buildbroken.graph.planet.data.StarSystemLink;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,10 +50,16 @@ public class RenderPanel extends JPanel
         Graphics2D g2 = (Graphics2D) g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        g2.setPaint(Color.BLACK);
+        g2.fillRect(-10, -10, (int)getSize().getWidth() + 10, (int)getSize().getHeight() + 10);
+
+        g2.setPaint(Color.LIGHT_GRAY);
         drawBorder(g2);
         drawGrid(g2);
         drawRuler(g2);
+
         drawData(g2);
+
         drawExtras(g2);
     }
 
@@ -147,6 +154,24 @@ public class RenderPanel extends JPanel
             for (StarSystem pos : galaxy.starSystems)
             {
                 drawCircle(g2, pos.renderColor, pos.x + plotOffsetX, pos.y + plotOffsetY, pos.renderSize, true);
+            }
+
+            //Calculate scale to fit display
+            double scaleX = getScaleX();
+            double scaleY = getScaleY();
+
+            for (StarSystemLink link : galaxy.links)
+            {
+                //Get pixel position
+                double x = PAD + scaleX * (link.a.x + plotOffsetX);
+                double y = getHeight() - PAD - scaleY * (link.a.y + plotOffsetY);
+
+                double x2 = PAD + scaleX * (link.b.x + plotOffsetX);
+                double y2 = getHeight() - PAD - scaleY * (link.b.y + plotOffsetY);
+
+                //Draw line
+                g2.setPaint(Color.YELLOW);
+                g2.draw(new Line2D.Double(x, y, x2, y2));
             }
         }
     }

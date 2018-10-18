@@ -10,4 +10,10 @@ public class StarSystemLink
     public StarSystem b;
 
     public double weight = 1;
+
+    public StarSystemLink(StarSystem a, StarSystem b)
+    {
+        this.a = a;
+        this.b = b;
+    }
 }
