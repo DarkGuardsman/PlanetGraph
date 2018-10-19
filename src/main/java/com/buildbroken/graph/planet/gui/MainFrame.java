@@ -78,6 +78,9 @@ public class MainFrame extends JFrame
     {
         final int minStarDistance = 5;
         final int starLinkDistance = 15;
+        final int spawnRadius = 250;
+        final int minimalSpawnRadius = 50;
+        int maxClusterLinkDistance = 50;
 
         System.out.println("MainFrame#generateData() - generating data");
 
@@ -90,21 +93,21 @@ public class MainFrame extends JFrame
         {
             //Randomize position
             double angle = Math.random() * 2 * Math.PI;
-            double range = (Math.random() * 250);
-            double x = range * Math.sin(angle) + 250;
-            double y = range * Math.cos(angle) + 250;
+            double range = (Math.random() * spawnRadius);
+            double x = range * Math.sin(angle) + spawnRadius;
+            double y = range * Math.cos(angle) + spawnRadius;
 
             //Create system
             StarSystem system = new StarSystem(x, y, randomColor());
             system.renderSize = 10 + (int) Math.random() * 5;
 
             //Limit distance
-            double distance = system.distance(250, 250);
-            if (distance > 250)
+            double distance = system.distance(spawnRadius, spawnRadius);
+            if (distance > spawnRadius)
             {
                 System.out.println("\t- to far from center, " + system);
             }
-            else if (distance > 50)
+            else if (distance > minimalSpawnRadius)
             {
                 //Prevent stars from stacking on each other
                 if (!galaxy.areAnyStarsNear(x, y, minStarDistance))
@@ -154,10 +157,68 @@ public class MainFrame extends JFrame
         //TODO remove overlap links
 
         //Build clusters
-        List<HashSet<StarSystem>> clusters = new ArrayList();
+        List<HashSet<StarSystem>> clusters = buildClusters(galaxy.starSystems);
+        int removeTicks = 0;
+        while (clusters.size() > 1)
+        {
+            if (tryToJoinClusters(clusters.get(0), clusters.get(1), maxClusterLinkDistance))
+            {
+                clusters.get(0).addAll(clusters.get(1));
+                clusters.remove(clusters.get(1));
+                removeTicks = 0;
+            }
+            else
+            {
+                removeTicks++;
+            }
 
+            //Prevent just merging first 2 entries
+            Collections.shuffle(clusters);
+
+            if(removeTicks >= 20)
+            {
+                removeTicks = 0;
+                maxClusterLinkDistance += 10;
+            }
+        }
+
+        //Build links between clusters
+
+        this.repaint();
+    }
+
+    protected boolean tryToJoinClusters(HashSet<StarSystem> clusterA, HashSet<StarSystem> clusterB, double maxDistance)
+    {
+        StarSystem starA = null;
+        StarSystem starB = null;
+        double distance = 0;
+        for (StarSystem starSystemA : clusterA)
+        {
+            for (StarSystem starSystemB : clusterB)
+            {
+                final double d = starSystemA.distanceSQ(starSystemB);
+                if (d < maxDistance && (starA == null || d < distance))
+                {
+                    starA = starSystemA;
+                    starB = starSystemB;
+                    distance = d;
+                }
+            }
+        }
+
+        if (starA != null)
+        {
+            galaxy.links.add(new StarSystemLink(starA, starB).buildLink());
+            return true;
+        }
+        return false;
+    }
+
+    protected List<HashSet<StarSystem>> buildClusters(List<StarSystem> galaxyStars)
+    {
+        List<HashSet<StarSystem>> clusters = new ArrayList();
         HashSet<StarSystem> pathedStars = new HashSet();
-        for (StarSystem system : galaxy.starSystems)
+        for (StarSystem system : galaxyStars)
         {
             if (!pathedStars.contains(system))
             {
@@ -175,19 +236,16 @@ public class MainFrame extends JFrame
                 clusters.add(systems);
 
                 Color color = randomColor();
-                for(StarSystem s : systems)
+                for (StarSystem s : systems)
                 {
-                    for(StarSystemLink link : s.links)
+                    for (StarSystemLink link : s.links)
                     {
-                        link.color = color;
+                        link.renderColor = color;
                     }
                 }
             }
         }
-
-        //Build links between clusters
-
-        this.repaint();
+        return clusters;
     }
 
     protected void collectStarsOnPath(HashSet<StarSystem> systems, StarSystem star)
