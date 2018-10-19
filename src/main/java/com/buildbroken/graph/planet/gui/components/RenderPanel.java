@@ -150,12 +150,6 @@ public class RenderPanel extends JPanel
     {
         if (galaxy != null)
         {
-            //Render data points
-            for (StarSystem pos : galaxy.starSystems)
-            {
-                drawCircle(g2, pos.renderColor, pos.x + plotOffsetX, pos.y + plotOffsetY, pos.renderSize, true);
-            }
-
             //Calculate scale to fit display
             double scaleX = getScaleX();
             double scaleY = getScaleY();
@@ -170,8 +164,15 @@ public class RenderPanel extends JPanel
                 double y2 = getHeight() - PAD - scaleY * (link.b.y + plotOffsetY);
 
                 //Draw line
-                g2.setPaint(link.color);
+                g2.setPaint(link.renderColor);
+                g2.setStroke(new BasicStroke(link.renderSize));
                 g2.draw(new Line2D.Double(x, y, x2, y2));
+            }
+
+            //Render data points
+            for (StarSystem pos : galaxy.starSystems)
+            {
+                drawCircle(g2, pos.renderColor, pos.x + plotOffsetX, pos.y + plotOffsetY, pos.renderSize, true);
             }
         }
     }

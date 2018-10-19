@@ -13,7 +13,8 @@ public class StarSystemLink
 
     public double weight;
 
-    public Color color = Color.YELLOW;
+    public Color renderColor = Color.YELLOW;
+    public int renderSize = 2;
 
     public StarSystemLink(StarSystem a, StarSystem b)
     {
