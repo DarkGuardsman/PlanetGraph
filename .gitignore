@@ -4,3 +4,7 @@
 *.iml
 
 \.gradle/
+
+*.ipr
+
+PlanetGraph\.iws
